@@ -20,6 +20,7 @@ import remember_dto.JWTUser;
 import remember_dto.UserFriendsDisp;
 import remember_dto.UserLogin;
 import remember_dto.UserSignUp;
+import remember_service.GetConnectionRequestsService;
 import remember_service.GetPeopleService;
 import remember_service.UserGetFriendsService;
 import remember_service.UserLoginService;
@@ -44,6 +45,8 @@ public class RememberRequestMapper {
 	GetPeopleService getPeople;
 	@Autowired
 	JwtGenerator jwtGenerator;
+	@Autowired
+	GetConnectionRequestsService getConnectionRequestsService;
 	
 	static Logger log = Logger.getLogger(RememberRequestMapper.class.getName());
 	
@@ -134,6 +137,31 @@ public class RememberRequestMapper {
 		}
 		
 	}
+	
+	@RequestMapping(value = "/rem/getConnectionsRequests" , method = RequestMethod.POST , consumes = "text/plain" )
+	@ResponseBody
+	public List<UserFriendsDisp> getConnectionsRequests( @RequestHeader("Authorization") String Token , HttpServletResponse response) 
+	{
+		log.info("Getting poeple to Connect");
+
+		JWTUser jwtUser = this.getUserInfoFromToken(Token);
+		
+		
+		try {
+			List<UserFriendsDisp> requests_list =  getConnectionRequestsService.getAllRequests(jwtUser.getId());
+			response.addHeader("access-control-expose-headers", "Authorization");
+			response.setHeader("Authorization", this.jwtGenerator.generate(jwtUser));
+			return requests_list;
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			return null;
+		}catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+
 	
 	public JWTUser getUserInfoFromToken(String Token)
 	{

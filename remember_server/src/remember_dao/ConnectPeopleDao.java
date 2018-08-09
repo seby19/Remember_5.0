@@ -35,8 +35,8 @@ public class ConnectPeopleDao {
 			userData  =  (UserSignUp)criteria.add(Restrictions.eq("username_sign", userName)).uniqueResult();
 			System.out.println("userId Connectpeopeldao : " + userData.getId());
 			connectPeople.setStatus(0);
-			connectPeople.setFriendId(friendId);
-			connectPeople.setUserId(userData.getId());
+			connectPeople.setFriendId(userData.getId());
+			connectPeople.setUserId(friendId);
 			session.save(connectPeople);
 			tran.commit();
 			session.close();
