@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Dummy Spring security config -->
+
+
+<beans:beans	xmlns="http://www.springframework.org/schema/security"   
+	xmlns:beans ="http://www.springframework.org/schema/beans"
+	xmlns:context = "http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+    http://www.springframework.org/schema/security 
+    http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+	
+	<global-method-security pre-post-annotations="enabled" />  
+    
+    <http pattern="/login" security="none"/>   
+    <http pattern="/signup" security="none"/>
+
+    <http pattern="/rem/**" entry-point-ref="restAuthenticationEntryPoint" create-session="stateless" > 
+        
+        <custom-filter before="FORM_LOGIN_FILTER" ref="jwtAuthenticationFilter"/>  
+    </http>
+    
+    <beans:bean id="jwtAuthenticationFilter" class="authentication.JwtAuthenticationTokenFilter">  
+        <beans:property name="authenticationManager" ref="authenticationManager" />
+        <beans:property name="authenticationSuccessHandler" ref="jwtAuthenticationSuccessHandler" />  
+    </beans:bean>
+    
+    <beans:bean id = "jwtAuthenticationProvider" class="authentication.JWTAuthenticationProvider">
+    </beans:bean>
+    
+    <beans:bean id = "restAuthenticationEntryPoint" class="authentication.JWTAuthenticationEntryPoint">
+    </beans:bean>
+    
+    
+    <beans:bean id = "jwtAuthenticationSuccessHandler" class="authentication.JWTSuccessHandler">
+    </beans:bean>
+
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider ref="jwtAuthenticationProvider" />  
+    </authentication-manager>
+
+</beans:beans>

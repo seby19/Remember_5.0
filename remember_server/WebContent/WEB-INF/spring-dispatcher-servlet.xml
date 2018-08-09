@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Dummy Spring  config -->
+
+<b:beans	xmlns="http://www.springframework.org/schema/security"   
+	xmlns:b ="http://www.springframework.org/schema/beans"
+	xmlns:context = "http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+    http://www.springframework.org/schema/security 
+    http://www.springframework.org/schema/security/spring-security.xsd">
+	
+	
+	<!-- <bean id = "HandlerMapping" class = "org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"></bean> -->
+	
+	<context:component-scan base-package="com"/>
+	<context:component-scan base-package="remember_dao"/>
+	<context:component-scan base-package="remember_service"/>
+	<context:component-scan base-package="authentication"/>
+	 <mvc:annotation-driven />
+	
+	
+	<!--<mvc:interceptors>
+		<bean class="com.NameInterseptor"></bean>
+	</mvc:interceptors> -->
+	
+	
+	
+	<b:bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dataSource">
+	 <b:property name="driverClassName" value="com.mysql.jdbc.Driver"></b:property>
+	 <b:property name="url" value="jdbc:mysql://localhost:3306/test"></b:property>
+	 <b:property name="username" value="root"></b:property>
+	 <b:property name="password" value="Changeyourlife"></b:property>
+	</b:bean>
+	
+<!-- 	<bean id = "sessionFactory" class = "org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean"> -->
+<b:bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+
+		<b:property name="dataSource" ref = "dataSource"/>
+		<b:property name="packagesToScan" value = "remember_dto"></b:property>
+		<!-- <property name="hbm2ddl" value="update"/> -->	
+		<b:property name="hibernateProperties">
+			<b:props>
+				<b:prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</b:prop>
+				<b:prop key="hibernate.hbm2ddl.auto">create</b:prop>  
+                <b:prop key="hibernate.show_sql">true</b:prop>
+			</b:props>
+		</b:property>
+	</b:bean>
+
+   <!--  <bean name="/getEmployees" 
+		class="com.HelloWorld" /> -->
+		
+    <!-- <bean id="viewResolver"
+    	class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
+        <property name="prefix">
+            <value>/WEB-INF/</value>
+        </property>
+        <property name="suffix">
+            <value>.jsp</value>
+        </property>
+    </bean> -->
+    
+    
+    
+
+</b:beans>
