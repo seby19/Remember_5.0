@@ -14,6 +14,7 @@ import authentication.JWTValidator;
 import authentication.JwtGenerator;
 import remember_dto.JWTAuthenticationToken;
 import remember_dto.JWTUser;
+import remember_dto.UserFriendsDisp;
 import remember_service.ConnectPeopleService;
 
 @Controller
@@ -23,23 +24,25 @@ public class WebSocketController {
 	JwtGenerator jwtGenerator;
 	@Autowired
 	ConnectPeopleService connectPeopleService;
+	@Autowired
+	UserFriendsDisp userData = null;
 	
 	@MessageMapping(value = "/getConnections/{friendUsername}")
 	@SendTo("/broker/{friendUsername}/queue/showFriends")
 	//@SendToUser("/queue/showFriends")
-	public String OnRecieveShowFriends( String connectId , @DestinationVariable String friendUsername , Principal principal) throws NumberFormatException, Exception
+	public UserFriendsDisp OnRecieveShowFriends( String connectId , @DestinationVariable String friendUsername , Principal principal) throws NumberFormatException, Exception
 	{
 		System.out.println("username :" +friendUsername);
 		System.out.println("Principal" + principal.getName());
 		System.out.println("In WebSocket");
 		
-		boolean status = connectPeopleService.connectPeople(Long.parseLong(connectId), principal.getName());
-		System.out.println("status : " + status);
-		if(!status)
+		userData = connectPeopleService.connectPeople(Long.parseLong(connectId), principal.getName());
+		//System.out.println("status : " + status);
+		if(userData == null)
 		{
 			throw new RuntimeException("Connection Did'nt take places");
 		}
-		return (principal.getName());
+		return (userData);
 	}
 	
 	public JWTUser getUserInfoFromToken(String Token)

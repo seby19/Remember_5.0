@@ -1,7 +1,8 @@
 package remember_dto;
 
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class UserFriendsDisp {
 	private Long id;
 	private String username;
