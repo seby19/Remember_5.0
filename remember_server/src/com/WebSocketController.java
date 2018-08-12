@@ -16,6 +16,7 @@ import remember_dto.JWTAuthenticationToken;
 import remember_dto.JWTUser;
 import remember_dto.UserFriendsDisp;
 import remember_service.ConnectPeopleService;
+import remember_service.EditConnectionsService;
 
 @Controller
 public class WebSocketController {
@@ -25,7 +26,9 @@ public class WebSocketController {
 	@Autowired
 	ConnectPeopleService connectPeopleService;
 	@Autowired
-	UserFriendsDisp userData = null;
+	UserFriendsDisp userData ;
+	@Autowired
+	EditConnectionsService editConnectionsService;
 	
 	@MessageMapping(value = "/getConnections/{friendUsername}")
 	@SendTo("/broker/{friendUsername}/queue/showFriends")
@@ -44,6 +47,26 @@ public class WebSocketController {
 		}
 		return (userData);
 	}
+	
+	@MessageMapping(value = "/editConnections/{friendUsername}/{property}")
+	@SendTo("/broker/{friendUsername}/queue/showConnections")
+	//@SendToUser("/queue/showFriends")
+	public UserFriendsDisp editConnections( String connectId , @DestinationVariable String friendUsername ,@DestinationVariable int property ,  Principal principal) throws NumberFormatException, Exception
+	{
+		System.out.println("username :" +friendUsername);
+		System.out.println("Principal" + principal.getName());
+		System.out.println("In WebSocket edit connections");
+		
+		userData = editConnectionsService.editConnection(Long.parseLong(connectId), principal.getName() , property);
+		//System.out.println("status : " + status);
+		/*if(userData == null)
+		{
+			throw new RuntimeException("Connection Did'nt take places");
+		}*/
+		return (userData);
+	}
+	
+	
 	
 	public JWTUser getUserInfoFromToken(String Token)
 	{

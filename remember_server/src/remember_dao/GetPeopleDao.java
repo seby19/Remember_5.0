@@ -32,9 +32,9 @@ public class GetPeopleDao {
 				+ " and not exists (select frnd.friend_id from user_friends frnd where frnd.user_id = :userid_b"
 				+ "	and frnd.friend_id = uinf.user_id)"
 				+ " and not exists (select rqst.user_id from connect_people rqst where rqst.friend_id = :userid_c"
-				+ " and rqst.user_id = uinf.user_id)"
+				+ " and rqst.user_id = uinf.user_id and rqst.status in (0 , 1))"
 				+ " and not exists (select rqst.friend_id from connect_people rqst where rqst.user_id = :userid_c"
-				+ " and rqst.friend_id = uinf.user_id)";
+				+ " and rqst.friend_id = uinf.user_id and rqst.status in (0 , 1))";
 		this.peoples_list = new ArrayList<UserFriendsDisp>();
 		try {
 			Session session = sessionFactory.openSession();
