@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import authentication.JWTValidator;
 import authentication.JwtGenerator;
+import remember_dto.GroupsDto;
 import remember_dto.JWTAuthenticationToken;
 import remember_dto.JWTUser;
 import remember_dto.UserFriendsDisp;
@@ -22,6 +23,7 @@ import remember_dto.UserLogin;
 import remember_dto.UserSignUp;
 import remember_service.GetConnectionRequestsService;
 import remember_service.GetPeopleService;
+import remember_service.GroupsService;
 import remember_service.UserGetFriendsService;
 import remember_service.UserLoginService;
 import remember_service.UserSignUPService;
@@ -47,6 +49,8 @@ public class RememberRequestMapper {
 	JwtGenerator jwtGenerator;
 	@Autowired
 	GetConnectionRequestsService getConnectionRequestsService;
+	@Autowired
+	GroupsService groupsService;
 	
 	static Logger log = Logger.getLogger(RememberRequestMapper.class.getName());
 	
@@ -161,7 +165,31 @@ public class RememberRequestMapper {
 		}
 		
 	}
+	
+	
+	@RequestMapping(value = "/rem/CreateGroup" , method = RequestMethod.POST )
+	@ResponseBody
+	public int createGroups( @RequestHeader("Authorization") String Token , @RequestBody GroupsDto group , HttpServletResponse response) 
+	{
+		log.info("Getting poeple to Connect");
 
+		JWTUser jwtUser = this.getUserInfoFromToken(Token);
+		
+		try {
+			System.out.println("group name" + group.getGroupName());
+			System.out.println("group Desc" + group.getGroupDesc());
+			System.out.println("Admin id" + jwtUser.getId());
+			int result = groupsService.CreateGroup(group , jwtUser.getId());
+			response.addHeader("access-control-expose-headers", "Authorization");
+			response.setHeader("Authorization", this.jwtGenerator.generate(jwtUser));
+			return result;
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			return 3;
+		}
+		
+	}
 	
 	public JWTUser getUserInfoFromToken(String Token)
 	{
