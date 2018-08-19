@@ -21,7 +21,7 @@ public class GroupsDao {
 	static Logger log = Logger.getLogger(GroupsDao.class.getName());
 	
 	
-	public int getGroupNameChecked(GroupsDto group , Long id) {
+	public long getGroupNameChecked(GroupsDto group , Long id) {
 		try {
 			Session session = sessionFactory.openSession();
 			Transaction tran = session.beginTransaction();
@@ -34,10 +34,10 @@ public class GroupsDao {
 			
 					
 		} catch (Exception e) {
-			return 3;
+			return -1;
 		}
 		
-		return 1;
+		return groups.getId();
 	}
 
 }

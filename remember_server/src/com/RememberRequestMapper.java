@@ -169,7 +169,7 @@ public class RememberRequestMapper {
 	
 	@RequestMapping(value = "/rem/CreateGroup" , method = RequestMethod.POST )
 	@ResponseBody
-	public int createGroups( @RequestHeader("Authorization") String Token , @RequestBody GroupsDto group , HttpServletResponse response) 
+	public long createGroups( @RequestHeader("Authorization") String Token , @RequestBody GroupsDto group , HttpServletResponse response) 
 	{
 		log.info("Getting poeple to Connect");
 
@@ -179,14 +179,14 @@ public class RememberRequestMapper {
 			System.out.println("group name" + group.getGroupName());
 			System.out.println("group Desc" + group.getGroupDesc());
 			System.out.println("Admin id" + jwtUser.getId());
-			int result = groupsService.CreateGroup(group , jwtUser.getId());
+			long result = groupsService.CreateGroup(group , jwtUser.getId());
 			response.addHeader("access-control-expose-headers", "Authorization");
 			response.setHeader("Authorization", this.jwtGenerator.generate(jwtUser));
 			return result;
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
-			return 3;
+			return -1;
 		}
 		
 	}

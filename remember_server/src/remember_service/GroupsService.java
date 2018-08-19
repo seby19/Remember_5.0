@@ -12,7 +12,7 @@ public class GroupsService {
 	@Autowired
 	GroupsDao groupsDao;
 	
-	public int CreateGroup(GroupsDto group , Long id) {
+	public long CreateGroup(GroupsDto group , Long id) {
 		
 		return groupsDao.getGroupNameChecked(group , id);
 	}
