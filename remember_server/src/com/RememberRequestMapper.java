@@ -118,6 +118,30 @@ public class RememberRequestMapper {
 		
 	}
 	
+	@RequestMapping(value = "/rem/getFriendsToAdd" ,method = RequestMethod.POST )
+	@ResponseBody
+	public List<UserFriendsDisp> getGroupAddFriendsList(@RequestBody String groupId ,@RequestHeader("Authorization") String Token , HttpServletResponse response) 
+	{
+		log.info("requesting for friends to add to group");
+
+		JWTUser jwtUser = this.getUserInfoFromToken(Token);
+		
+		try {
+			List<UserFriendsDisp> frnds_list = groupsService.getGroupAddFriendsList(Long.parseLong(groupId), jwtUser.getId()) ;
+			response.addHeader("access-control-expose-headers", "Authorization");
+			response.setHeader("Authorization", this.jwtGenerator.generate(jwtUser));
+			return frnds_list;
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			return null;
+		}catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+
+	
 	@RequestMapping(value = "/rem/getPeople" ,method = RequestMethod.POST , consumes = "text/plain")
 	@ResponseBody
 	public List<UserFriendsDisp> getPeople( @RequestHeader("Authorization") String Token , HttpServletResponse response) 

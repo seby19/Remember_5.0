@@ -12,11 +12,13 @@ import org.springframework.stereotype.Controller;
 
 import authentication.JWTValidator;
 import authentication.JwtGenerator;
+import remember_dto.CreateGroupsDto;
 import remember_dto.JWTAuthenticationToken;
 import remember_dto.JWTUser;
 import remember_dto.UserFriendsDisp;
 import remember_service.ConnectPeopleService;
 import remember_service.EditConnectionsService;
+import remember_service.GroupsService;
 
 @Controller
 public class WebSocketController {
@@ -29,6 +31,11 @@ public class WebSocketController {
 	UserFriendsDisp userData ;
 	@Autowired
 	EditConnectionsService editConnectionsService;
+	@Autowired
+	GroupsService groupsService;
+	@Autowired
+	CreateGroupsDto groups;
+	
 	
 	@MessageMapping(value = "/getConnections/{friendUsername}")
 	@SendTo("/broker/{friendUsername}/queue/showFriends")
@@ -64,6 +71,15 @@ public class WebSocketController {
 			throw new RuntimeException("Connection Did'nt take places");
 		}*/
 		return (userData);
+	}
+	
+	@MessageMapping(value = "/addPersonToGroup/{friendUsername}")
+	@SendTo("/broker/{friendUsername}/queue/newGroup")
+	public CreateGroupsDto addPersonToGroup( String groupId , @DestinationVariable String friendUsername,  Principal principal) throws NumberFormatException, Exception
+	{
+
+		groups = groupsService.addPersonToGroup(friendUsername , Long.parseLong(groupId));
+		return (groups);
 	}
 	
 	
