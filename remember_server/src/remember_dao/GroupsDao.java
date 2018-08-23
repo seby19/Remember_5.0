@@ -37,10 +37,10 @@ public class GroupsDao {
 	static Logger log = Logger.getLogger(GroupsDao.class.getName());
 	
 	List<UserFriendsDisp> friends_list ;
-	
+	List<CreateGroupsDto> groups_list ;
 
 	
-	public long getGroupNameChecked(GroupsDto group , Long id) {
+	public CreateGroupsDto getGroupNameChecked(GroupsDto group , Long id) {
 		try {
 			Session session = sessionFactory.openSession();
 			Transaction tran = session.beginTransaction();
@@ -56,10 +56,10 @@ public class GroupsDao {
 			
 					
 		} catch (Exception e) {
-			return -1;
+			return null;
 		}
 		
-		return groups.getId();
+		return groups;
 	}
 	
 	public List<UserFriendsDisp> getGroupAddFriendsList(long groupId ,long user_id) {
@@ -124,5 +124,47 @@ public class GroupsDao {
 		}
 		
 		return groups;
+	}
+	
+	public List<CreateGroupsDto> getGroupsList(long id)
+	{
+		try {
+			Session session = sessionFactory.openSession();
+			Transaction tran = session.beginTransaction();
+			String sql = "select * from groups_master grp_mas where exists " + 
+					"( select grp_ppl.group_id from group_people grp_ppl where grp_ppl.user_id = :user_id " + 
+					"	and grp_mas.group_id = grp_ppl.group_id) ";
+			this.groups_list = new ArrayList<CreateGroupsDto>();
+			
+			SQLQuery query = session.createSQLQuery(sql).addScalar("group_id",  LongType.INSTANCE).addScalar("admin_id",  LongType.INSTANCE)
+					.addScalar("description", StringType.INSTANCE).addScalar("group_name", StringType.INSTANCE);
+			
+			query.setLong("user_id", id);
+			
+			List<Object []> rows= query.list();
+			if(rows != null)
+			{
+				
+				for(Object []  iter : rows)
+				{	
+					CreateGroupsDto group  = new CreateGroupsDto();
+					group.setId(Long.parseLong(iter[0].toString()));
+					group.setAdminId(Long.parseLong(iter[1].toString()));
+					group.setGroupDesc(iter[2].toString());
+					group.setGroupName(iter[3].toString());
+					
+					System.out.println(group.toString() + " values of groups");
+					
+					groups_list.add(group);
+				}
+			}
+			session.close();
+			
+					
+		} catch (Exception e) {
+			return null;
+		}
+		
+		return groups_list;
 	}
 }

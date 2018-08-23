@@ -16,7 +16,7 @@ public class GroupsService {
 	@Autowired
 	GroupsDao groupsDao;
 	
-	public long CreateGroup(GroupsDto group , Long id) {
+	public CreateGroupsDto CreateGroup(GroupsDto group , Long id) {
 		
 		return groupsDao.getGroupNameChecked(group , id);
 	}
@@ -30,5 +30,9 @@ public class GroupsService {
 	{
 		return groupsDao.addPersonToGroup(friendUsername , groupId);
 	}
-
+	
+	public List<CreateGroupsDto> getGroupsList(long id)
+	{
+		return groupsDao.getGroupsList(id);
+	}
 }

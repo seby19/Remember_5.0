@@ -1,6 +1,7 @@
 package com;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import authentication.JWTValidator;
 import authentication.JwtGenerator;
+import remember_dto.CreateGroupsDto;
 import remember_dto.GroupsDto;
 import remember_dto.JWTAuthenticationToken;
 import remember_dto.JWTUser;
@@ -118,6 +120,33 @@ public class RememberRequestMapper {
 		
 	}
 	
+	@RequestMapping(value = "/rem/getGroups" ,method = RequestMethod.POST , consumes = "text/plain")
+	@ResponseBody
+	public List<CreateGroupsDto> getGroupsList( @RequestHeader("Authorization") String Token , HttpServletResponse response) 
+	{
+		log.info("requesting for groups list");
+
+		JWTUser jwtUser = this.getUserInfoFromToken(Token);
+		
+		try {
+			System.out.println("Group _ list size user id " + jwtUser.getId() );
+			List<CreateGroupsDto> result = new ArrayList<CreateGroupsDto>();
+			result = groupsService.getGroupsList(jwtUser.getId());
+			response.addHeader("access-control-expose-headers", "Authorization");
+			response.setHeader("Authorization", this.jwtGenerator.generate(jwtUser));
+			System.out.println("Group _ list size " + result.size()  );
+			return result;
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			return null;
+		}catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+	
+	
 	@RequestMapping(value = "/rem/getFriendsToAdd" ,method = RequestMethod.POST )
 	@ResponseBody
 	public List<UserFriendsDisp> getGroupAddFriendsList(@RequestBody String groupId ,@RequestHeader("Authorization") String Token , HttpServletResponse response) 
@@ -193,7 +222,7 @@ public class RememberRequestMapper {
 	
 	@RequestMapping(value = "/rem/CreateGroup" , method = RequestMethod.POST )
 	@ResponseBody
-	public long createGroups( @RequestHeader("Authorization") String Token , @RequestBody GroupsDto group , HttpServletResponse response) 
+	public CreateGroupsDto createGroups( @RequestHeader("Authorization") String Token , @RequestBody GroupsDto group , HttpServletResponse response) 
 	{
 		log.info("Getting poeple to Connect");
 
@@ -203,14 +232,14 @@ public class RememberRequestMapper {
 			System.out.println("group name" + group.getGroupName());
 			System.out.println("group Desc" + group.getGroupDesc());
 			System.out.println("Admin id" + jwtUser.getId());
-			long result = groupsService.CreateGroup(group , jwtUser.getId());
+			CreateGroupsDto result = groupsService.CreateGroup(group , jwtUser.getId());
 			response.addHeader("access-control-expose-headers", "Authorization");
 			response.setHeader("Authorization", this.jwtGenerator.generate(jwtUser));
 			return result;
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
-			return -1;
+			return null;
 		}
 		
 	}
