@@ -16,16 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import authentication.JWTValidator;
 import authentication.JwtGenerator;
+import remember_dao.PostsDisp;
 import remember_dto.CreateGroupsDto;
 import remember_dto.GroupsDto;
 import remember_dto.JWTAuthenticationToken;
 import remember_dto.JWTUser;
+import remember_dto.Posts;
 import remember_dto.UserFriendsDisp;
 import remember_dto.UserLogin;
 import remember_dto.UserSignUp;
 import remember_service.GetConnectionRequestsService;
 import remember_service.GetPeopleService;
 import remember_service.GroupsService;
+import remember_service.PostService;
 import remember_service.UserGetFriendsService;
 import remember_service.UserLoginService;
 import remember_service.UserSignUPService;
@@ -53,6 +56,8 @@ public class RememberRequestMapper {
 	GetConnectionRequestsService getConnectionRequestsService;
 	@Autowired
 	GroupsService groupsService;
+	@Autowired
+	PostService postService;
 	
 	static Logger log = Logger.getLogger(RememberRequestMapper.class.getName());
 	
@@ -244,6 +249,29 @@ public class RememberRequestMapper {
 		
 	}
 	
+	@RequestMapping(value = "/rem/getPosts" , method = RequestMethod.POST )
+	@ResponseBody
+	public List<PostsDisp> getPosts( @RequestHeader("Authorization") String Token , @RequestBody String groupId , HttpServletResponse response) 
+	{
+		log.info("Getting poeple to Connect");
+
+		JWTUser jwtUser = this.getUserInfoFromToken(Token);
+		
+		try {
+
+			
+			List<PostsDisp> posts = postService.getPosts(Long.parseLong(groupId));
+			response.addHeader("access-control-expose-headers", "Authorization");
+			response.setHeader("Authorization", this.jwtGenerator.generate(jwtUser));
+			return posts;
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+
 	public JWTUser getUserInfoFromToken(String Token)
 	{
 		JWTUser jwtUser = null;
