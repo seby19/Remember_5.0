@@ -18,5 +18,8 @@ public class PostService {
 	{
 		return postDao.getPosts(grpId);
 	}
-	
+	public PostsDisp addPost(Long groupId ,String  postData ,String userName)
+	{
+		return postDao.addPost(groupId , postData , userName);
+	}
 }

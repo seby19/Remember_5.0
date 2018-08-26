@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 
 import authentication.JWTValidator;
 import authentication.JwtGenerator;
+import remember_dao.PostsDisp;
 import remember_dto.CreateGroupsDto;
 import remember_dto.JWTAuthenticationToken;
 import remember_dto.JWTUser;
@@ -19,6 +20,7 @@ import remember_dto.UserFriendsDisp;
 import remember_service.ConnectPeopleService;
 import remember_service.EditConnectionsService;
 import remember_service.GroupsService;
+import remember_service.PostService;
 
 @Controller
 public class WebSocketController {
@@ -35,6 +37,10 @@ public class WebSocketController {
 	GroupsService groupsService;
 	@Autowired
 	CreateGroupsDto groups;
+	@Autowired
+	PostsDisp post;
+	@Autowired
+	PostService postService;
 	
 	
 	@MessageMapping(value = "/getConnections/{friendUsername}")
@@ -80,6 +86,14 @@ public class WebSocketController {
 
 		groups = groupsService.addPersonToGroup(friendUsername , Long.parseLong(groupId));
 		return (groups);
+	}
+	
+	@MessageMapping(value = "/setPost/{groupId}")
+	@SendTo("/broker/{groupId}/queue/newPost")
+	public PostsDisp addPost( String postData , @DestinationVariable String groupId,  Principal principal) throws NumberFormatException, Exception
+	{
+		post = postService.addPost(Long.parseLong(groupId) , postData , principal.getName());
+		return (post);
 	}
 	
 	

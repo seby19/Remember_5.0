@@ -8,6 +8,7 @@ import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import remember_dto.Posts;
 import remember_dto.UserFriendsDisp;
+import remember_dto.UserSignUp;
 
 
 @Repository
@@ -24,8 +26,12 @@ public class PostDao {
 	Posts post;
 	@Autowired
 	SessionFactory sessionFactory;
+	@Autowired
+	UserSignUp userData;
 	
 	List<PostsDisp> posts;
+	@Autowired
+	PostsDisp postDta;
 	
 	static Logger log = Logger.getLogger(PostDao.class.getName());
 
@@ -35,7 +41,7 @@ public class PostDao {
 		try {
 			
 			Session session = sessionFactory.openSession();
-			session.beginTransaction();
+			Transaction tran = session.beginTransaction();
 			String sql = " select posts.post_id , posts.content , posts.group_id, " + 
 					"  posts.user_id , users.username from group_posts posts , users_info users " + 
 					"where posts.user_id = users.user_id " + 
@@ -65,7 +71,8 @@ public class PostDao {
 					posts.add(postt);
 				}
 			}
-			
+			tran.commit();
+			session.close();
 			
 		}catch (Exception e) {
 			return null;
@@ -73,5 +80,29 @@ public class PostDao {
 		
 		
 		return posts;
+	}
+	public PostsDisp addPost(Long groupId ,String  postData ,String userName)
+	{
+		try {
+			Session session = this.sessionFactory.openSession();
+			Transaction tran = session.beginTransaction();
+			Criteria criteria = session.createCriteria(UserSignUp.class);
+			userData  =  (UserSignUp)criteria.add(Restrictions.eq("username_sign", userName)).uniqueResult();
+			post.setUserId(userData.getId());
+			post.setContent(postData);
+			post.setGroupId(groupId);
+			
+			session.save(post);
+			postDta.setContent(postData);
+			postDta.setGroupId(groupId);
+			postDta.setId(post.getId());
+			postDta.setUserId(post.getUserId());
+			postDta.setUsername(userData.getUsername_sign());
+			tran.commit();
+			session.close();
+		}catch (Exception e) {
+			return null;
+		}
+		return postDta;
 	}
 }
